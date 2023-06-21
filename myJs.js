@@ -1,6 +1,6 @@
 let items = [];
 
-
+const list = document.querySelector('.list');
 const addPizzaForm = document.querySelector('.add-pizza-form');
 
 function handleSubmit(e) {
@@ -27,6 +27,33 @@ function handleSubmit(e) {
     e.currentTarget.reset();
     displayItems();
 };
+
+const displayItems = () => {
+    const html = items.map(item => {
+        return (
+            `
+                <li class="pizza-item">
+                    <button class="delete">&times;</button>
+                    <div class="pizza-item-image">
+                        <img src="${item.image}" alt="${item.title}">
+                    </div>
+                    <div class="pizza-items-details">
+                        <div class="pizza-items-details-top">
+                            <div class="itemHeader">
+                                <input type="checkbox">
+                                <span class ="itemName">${item.title}</span>
+                            </div>
+                            <span class="itemPrice">${item.price}</span>
+                        </div>
+                        <span class="pizza-items-details-bottom">${item.description}</span>
+                    </div>
+                </li>
+            `
+        )
+    }).join('');
+    list.innerHTML = html;
+};
+
 
 addPizzaForm.addEventListener('submit', handleSubmit);
 
@@ -102,11 +129,7 @@ const selectPizzas = () => {
 };
 
 
-const displayItems = () => {
-    items.forEach(item => {
-        console.log(item)
-    });
-};
+
 
 
 
