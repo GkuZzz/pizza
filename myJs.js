@@ -2,6 +2,8 @@ let items = [];
 
 const list = document.querySelector(".list");
 const addPizzaForm = document.querySelector(".add-pizza-form");
+const buttonCheck = document.querySelector(".check-all-pizzas");
+
 
 function handleSubmit(e) {
   e.preventDefault();
@@ -41,7 +43,10 @@ const displayItems = () => {
                     <div class="pizza-items-details">
                         <div class="pizza-items-details-top">
                             <div class="itemHeader">
-                                <input type="checkbox">
+                                <input 
+                                    value="${item.id}" 
+                                    type="checkbox"
+                                    ${item.selected === true ? 'checked' : ''}>
                                 <span class ="itemName">${item.title}</span>
                             </div>
                             <span class="itemPrice">${item.price}</span>
@@ -89,8 +94,43 @@ const markAsSelected = (id) => {
   // pizzaItem.selected === true ? pizzaItem.selected = false : pizzaItem.selected = true;
 };
 
-const selectPizzas = () => {
-  let checkedPizza = 0;
+
+function saveToLocalStorage() {
+//   console.log("LS save");
+  localStorage.setItem("items", JSON.stringify(items));
+};
+
+function getFromLocalStorage() {
+  const localStorageItems = JSON.parse(localStorage.getItem("items"));
+
+  if (localStorageItems && localStorageItems.length) {
+    items.push(...localStorageItems);
+    list.dispatchEvent(new CustomEvent("itemsUpdated"));
+  }
+};
+
+addPizzaForm.addEventListener("submit", handleSubmit);
+list.addEventListener("itemsUpdated", displayItems);
+list.addEventListener("itemsUpdated", saveToLocalStorage);
+// Делегирование событий. Слушаем событие на родительском UL 
+// Делегируем событие элементу button
+list.addEventListener('click', function(e) {
+    const id = parseInt(e.target.value);
+    if (e.target.matches('button')) {
+        removePizza(id);
+    };
+
+    if (e.target.matches('input[type="checkbox"]')) {
+        markAsSelected(id)
+        console.log('checkedPizza')
+    }
+});
+
+
+getFromLocalStorage();
+
+buttonCheck.addEventListener('click', function(){
+    let checkedPizza = 0;
   let itemsChecked = [];
 
   items.forEach((pizza) => {
@@ -118,34 +158,6 @@ const selectPizzas = () => {
   items = itemsChecked;
 
   list.dispatchEvent(new CustomEvent("itemsUpdated"));
-};
-
-function saveToLocalStorage() {
-  console.log("LS save");
-  localStorage.setItem("items", JSON.stringify(items));
-};
-
-function getFromLocalStorage() {
-  const localStorageItems = JSON.parse(localStorage.getItem("items"));
-
-  if (localStorageItems && localStorageItems.length) {
-    items.push(...localStorageItems);
-    list.dispatchEvent(new CustomEvent("itemsUpdated"));
-  }
-};
-
-addPizzaForm.addEventListener("submit", handleSubmit);
-list.addEventListener("itemsUpdated", displayItems);
-list.addEventListener("itemsUpdated", saveToLocalStorage);
-// Делегирование событий. Слушаем событие на родительском UL 
-// Делегируем событие элементу button
-list.addEventListener('click', function(e){
-    if (e.target.matches('button')) {
-        removePizza(parseInt(e.target.value));
-    };
-});
-
-
-getFromLocalStorage();
+})
 
 
